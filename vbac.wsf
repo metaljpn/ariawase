@@ -218,12 +218,13 @@ CmdParam.prototype.parse = function(args) {
 };
 
 var Config = function(binary, source, binbak) {
-    var root = fso.GetParentFolderName(scriptPath);
-    this.bin = (isPathRooted(binary)) ? binary : fso.BuildPath(root, binary);
-    this.src = (isPathRooted(source)) ? source : fso.BuildPath(root, source);
+    var shell = WScript.CreateObject("WScript.Shell");
+    var currentDir = shell.CurrentDirectory;
+
+    this.bin = fso.GetAbsolutePathName(fso.BuildPath(currentDir, binary));
+    this.src = fso.GetAbsolutePathName(fso.BuildPath(currentDir, source));
     this.bak = (!binbak.flag) ? undefined
-             : (isPathRooted(binbak.value)) ? binbak.value
-             : fso.BuildPath(root, binbak.value);
+             : fso.GetAbsolutePathName(fso.BuildPath(currentDir, binbak.value));
 };
 Config.prototype.getBins = function() { return fso.GetFolder(this.bin).Files; };
 Config.prototype.getSrcs = function() { return fso.GetFolder(this.src).SubFolders; };
